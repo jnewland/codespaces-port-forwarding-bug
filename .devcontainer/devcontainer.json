@@ -1,0 +1,16 @@
+{
+	"name": "Codespaces and Websockets",
+	"build": {
+		"dockerfile": "Dockerfile",
+		"context": "..",
+		"args": { "VARIANT": "3" }
+	},
+
+	"extensions": [
+		"ms-python.python"
+	],
+
+	"postCreateCommand": "pip3 install -r requirements.txt",
+    "postStartCommand": "python server.py",
+	"remoteUser": "vscode"
+}
