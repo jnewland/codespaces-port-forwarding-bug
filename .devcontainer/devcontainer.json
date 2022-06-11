@@ -10,6 +10,14 @@
 		"ms-python.python"
 	],
 
+	"forwardPorts": [3000],
+	"portsAttributes": {
+		"3000": {
+			"label": "Webserver",
+			"onAutoForward": "notify"
+		}
+	},
+
 	"postCreateCommand": "pip3 install -r requirements.txt",
     "postStartCommand": "python server.py",
 	"remoteUser": "vscode"
