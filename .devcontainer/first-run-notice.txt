@@ -1,0 +1,4 @@
+👋 Welcome to GitHub Codespaces websocket timeout.
+
+📝 Type "python server.py" to get started.
+

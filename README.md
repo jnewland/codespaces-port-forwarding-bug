@@ -20,24 +20,13 @@ This repository is meant to make it easy to reproduce this issue for everyone wi
 
 ## Getting started
 
-### Devcontainer
-
-When starting this repository in GitHub Codespaces, it will install the required packages and launch the webserver.
-All that is left for you, is click under `Ports` the `Open Browser` on port 3000.
-
-### Manually
-
 Open this repository in Codespaces.
 
 ```bash
-python3 -m venv .env
-.env/bin/pip install -r requirements.txt
-.env/bin/python server.py
+python server.py
 ```
 
 Click on the `Open in Browser` button that now pops up.
-
-### After opening browser
 
 Wait ~4 minutes, and see `Connection lost!` message.
 You can press `Retry` to retry the test, and after 4 minutes you will see the `Connection lost!` message again.
