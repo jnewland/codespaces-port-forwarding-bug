@@ -84,7 +84,7 @@ async def hello(request):
         });
 
         socket.addEventListener("message", function (event) {
-            log("Ping/pong in " + ((new Date().getTime() - pingDate.getTime())).toFixed(0) + "ms.");
+            log(event.data + " in " + ((new Date().getTime() - pingDate.getTime())).toFixed(0) + "ms.");
 
             timeout = setTimeout(() => {
                 pingDate = new Date();
@@ -104,8 +104,11 @@ async def hello(request):
 
 @routes.get("/ws")
 async def websocket_handler(request):
+    origin = request.headers["Origin"]
+    logging.debug(f"<Request GET /ws > Origin={origin}")
     ws = web.WebSocketResponse()
     await ws.prepare(request)
+    logging.debug(f"<Request GET /ws > connected")
 
     async for msg in ws:
         if msg.type == aiohttp.WSMsgType.TEXT and msg.data == "ping":
@@ -116,7 +119,16 @@ async def websocket_handler(request):
 
 app = web.Application()
 app.add_routes(routes)
-logging.basicConfig(level=logging.DEBUG)
+
+from aiohttp.abc import AbstractAccessLogger
+
+
+class AccessLogger(AbstractAccessLogger):
+    def log(self, request, response, time):
+        self.logger.info(f"{request} {response} %.2fs" % time)
+
+
+logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 
 print("")
 print("Open the following link to replicate the bug:")
@@ -124,4 +136,4 @@ print("")
 print("  https://{}-3000.githubpreview.dev/".format(os.getenv("CODESPACE_NAME")))
 print("")
 
-web.run_app(app, port=3000)
+web.run_app(app, port=3000, access_log_class=AccessLogger)
