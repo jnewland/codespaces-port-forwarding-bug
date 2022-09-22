@@ -108,7 +108,7 @@ async def websocket_handler(request):
     logging.debug(f"<Request GET /ws > Origin={origin}")
     ws = web.WebSocketResponse()
     await ws.prepare(request)
-    logging.debug(f"<Request GET /ws > connected")
+    logging.debug(f"<Request GET /ws > Connected!")
 
     async for msg in ws:
         if msg.type == aiohttp.WSMsgType.TEXT and msg.data == "ping":
