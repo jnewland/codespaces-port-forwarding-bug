@@ -1,4 +1,5 @@
 import aiohttp
+import logging
 import os
 
 from aiohttp import web
@@ -115,9 +116,12 @@ async def websocket_handler(request):
 
 app = web.Application()
 app.add_routes(routes)
+logging.basicConfig(level=logging.DEBUG)
+
 print("")
 print("Open the following link to replicate the bug:")
 print("")
 print("  https://{}-3000.githubpreview.dev/".format(os.getenv("CODESPACE_NAME")))
 print("")
+
 web.run_app(app, port=3000)
