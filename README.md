@@ -1,44 +1,42 @@
-# GitHub Codespaces websocket timeout
+# GitHub Codespaces websocket bugs / limitations
 
-Websockets on GitHub Codespaces consistently close after ~4 minutes after being established.
+* Max ~4 minute connection duration https://github.com/TrueBrain/codespaces-websocket
+* Connectivity fails for 1-5 minutes at startup
 
-This problem only seem to exist on GitHub Codespaces, and seems to be related to their webproxy.
-When trying alternatives to GitHub Codespaces (like Gitpod), we do not see this issue.
-When trying alternatives to their webproxy (like ngrok), we also do not see this issue.
+## Reproduce
 
-The problem exists for both Private and Public ports.
-The problem exists with regular ping/pong messages or no messages at all.
-The problem is also very consistent: it never disconnects before the 4 minute mark, and always shortly after (sometimes on the dot, sometimes with a few seconds drift).
+- Create a new codespace from this repo
+- Run `python server.py`
+- Open the URL it prints
+- Observe the connectivity log
 
-This all combined gives the suspicion that this is a configuration on the GitHub webproxy, to disconnect any still-open connection after 4 minutes.
-This seems to forget the fact websockets exist in this world :)
+## Example
 
-The main issue with this disconnect is that a lot of web frameworks use a websocket during development to live-update the website, to make development a smooth experience.
-This disconnect every ~4 minutes kinda ruins that experience, as often web frameworks do a full reload after the websocket connection is lost.
-
-This repository is meant to make it easy to reproduce this issue for everyone with access to GitHub Codespaces.
-
-## Getting started
-
-Open this repository in Codespaces.
-
-```bash
-python server.py
 ```
+Attempting to connect to websocket every 10s and send a ping every 30s ....
 
-Click on the `Open in Browser` button that now pops up.
-
-Wait ~4 minutes, and see `Connection lost!` message.
-You can press `Retry` to retry the test, and after 4 minutes you will see the `Connection lost!` message again.
-Consistently.
-Always.
-
-## Alternatives tried
-
-- `Gitpod`: no disconnects any after measurable time.
-- `ngrok`: no disconnects any after measurable time.
-- `nodejs` as server: no difference.
-- `Private` vs `Public` port: no difference.
-- `Firefox` and `Chrome`: no difference.
-- Ping every 1 second: no difference.
-- No communication over websocket: no difference.
+Thu Sep 22 2022 09:53:03 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:53:04 GMT-0500 (CDT) => Connection failed! 0.66 seconds since page load.
+Thu Sep 22 2022 09:53:14 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:53:14 GMT-0500 (CDT) => Connection failed! 11.26 seconds since page load.
+Thu Sep 22 2022 09:53:24 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:53:25 GMT-0500 (CDT) => Connection failed! 21.76 seconds since page load.
+Thu Sep 22 2022 09:53:35 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:53:35 GMT-0500 (CDT) => Connection failed! 32.16 seconds since page load.
+Thu Sep 22 2022 09:53:45 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:53:47 GMT-0500 (CDT) => Connection failed! 43.36 seconds since page load.
+Thu Sep 22 2022 09:53:57 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:53:57 GMT-0500 (CDT) => Connection failed! 53.74 seconds since page load.
+Thu Sep 22 2022 09:54:07 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:54:07 GMT-0500 (CDT) => Connection failed! 64.19 seconds since page load.
+Thu Sep 22 2022 09:54:17 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:54:18 GMT-0500 (CDT) => Connection failed! 74.63 seconds since page load.
+Thu Sep 22 2022 09:54:28 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:54:28 GMT-0500 (CDT) => Connection failed! 85.07 seconds since page load.
+Thu Sep 22 2022 09:54:38 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:54:39 GMT-0500 (CDT) => Connection failed! 95.58 seconds since page load.
+Thu Sep 22 2022 09:54:49 GMT-0500 (CDT) => Connecting to wss://jnewland-codespaces-websockets-bug-g4wp4whwxvg-3000.githubpreview.dev/ws ...
+Thu Sep 22 2022 09:54:49 GMT-0500 (CDT) => Connected 106.16 seconds after page load.
+Thu Sep 22 2022 09:54:50 GMT-0500 (CDT) => Ping/pong in 141ms.
+Thu Sep 22 2022 09:55:20 GMT-0500 (CDT) => Ping/pong in 117ms.
+```

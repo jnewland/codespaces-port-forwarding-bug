@@ -1,4 +1,5 @@
 import aiohttp
+import os
 
 from aiohttp import web
 
@@ -10,62 +11,82 @@ async def hello(request):
     return web.Response(
         content_type="text/html",
         text="""
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Codespaces Websocket Test</title>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Websocket connectivity debug log</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 </head>
  
 <body>
-    <div>
-        This page will make a websocket connection to the server, and send a ping every 30 seconds.<br/>
-        It will tell you when the websocket connection is lost, and how much time there was between connect and disconnect.
-    </div>
+    <div class="container">
+        <h1>Websocket connectivity debug log</h1>
+        <p><a href="https://github.com/jnewland/codespaces-websockets-bug">https://github.com/jnewland/codespaces-websockets-bug</a></p>
+        <p>
+            Attempting to connect to websocket every 10s and send a ping every 30s ...
+        </p>
 
-    <div id="info">
-        Loading ...
-    </div>
+        <pre id="info">
+            Loading ...
+        </pre>
 
-    <button id="retry" onclick="StartTest()">Retry</button>
+    </div>
 </body>
  
 <script>
+    function log(string) {
+        document.getElementById("info").innerHTML += new Date() + " => " + string + "<br />";
+    }
+    let loadDate = new Date();
+    let connected = false;
     function StartTest() {
-        let startDate;
-
-        document.getElementById("info").innerHTML += "<br />" + new Date() + " => " + "Connecting ...";
-        // Hide the retry button for as long as we are connecting / connected.
-        document.getElementById("retry").style = "display: none;";
+        let startDate = new Date();
+        let pingDate;
 
         const url = "wss://" + window.location.host + "/ws";
+        log("Connecting to " + url + " ...");
+
         const socket = new WebSocket(url);
         let timeout;
 
         socket.addEventListener("open", function (event) {
-            startDate = new Date();
-            document.getElementById("info").innerHTML += "<br />" + new Date() + " => " + "Connected";
+            connected = true;
+            log("Connected " + ((new Date().getTime() - loadDate.getTime()) / 1000).toFixed(2) + " seconds after page load.");
+            // Cancel any old pings.
+            clearTimeout(timeout);
+
+            pingDate = new Date();
             socket.send("ping");
         });
 
         socket.addEventListener("close", function (event) {
-            document.getElementById("info").innerHTML += "<br />" + new Date() + " => " + "Connection lost!";
+            if (connected) {
+                log("Connection lost! Connected " + ((new Date().getTime() - startDate.getTime()) / 1000).toFixed(2) + " seconds.");
 
-            // Cancel the ping.
-            clearTimeout(timeout);
+                clearTimeout(timeout);
 
-            // Show the time we were connected.
-            document.getElementById("info").innerHTML += "<br /><br />Time between connect and disconnect: " + ((new Date().getTime() - startDate.getTime()) / 1000 / 60).toFixed(2) + " minutes<br />";
+                timeout = setTimeout(() => {
+                    StartTest();
+                }, 1000);
 
-            // Show a button you can press to start again. Avoids page reloads.
-            document.getElementById("retry").style = "display: block;";
+            } else {
+                log("Connection failed! " + ((new Date().getTime() - loadDate.getTime()) / 1000).toFixed(2) + " seconds since page load.");
+
+                timeout = setTimeout(() => {
+                    StartTest();
+                }, 10000);
+            }
+
         });
 
         socket.addEventListener("message", function (event) {
-            document.getElementById("info").innerHTML += "<br />" + new Date() + " => Ping/pong";
+            log("Ping/pong in " + ((new Date().getTime() - pingDate.getTime())).toFixed(0) + "ms.");
 
-            // Repeat the ping every 30 seconds to keep the websocket alive.
             timeout = setTimeout(() => {
+                pingDate = new Date();
                 socket.send("ping");
             }, 30000);
         });
@@ -94,4 +115,9 @@ async def websocket_handler(request):
 
 app = web.Application()
 app.add_routes(routes)
+print("")
+print("Open the following link to replicate the bug:")
+print("")
+print("  https://{}-3000.githubpreview.dev/".format(os.getenv("CODESPACE_NAME")))
+print("")
 web.run_app(app, port=3000)
