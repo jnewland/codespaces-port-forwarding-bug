@@ -6,6 +6,9 @@ from aiohttp import web
 
 routes = web.RouteTableDef()
 
+@routes.get("/auth/test")
+async def auth_test(request):
+    return web.json_response({'status': 'ok'})
 
 @routes.get("/")
 async def hello(request):
@@ -18,28 +21,47 @@ async def hello(request):
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Websocket connectivity debug log</title>
+    <title>Port forwarding connectivity debug log</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
 </head>
  
 <body>
     <div class="container">
-        <h1>Websocket connectivity debug log</h1>
-        <p><a href="https://github.com/jnewland/codespaces-websockets-bug">https://github.com/jnewland/codespaces-websockets-bug</a></p>
-        <p>
-            Attempting to connect to websocket every 10s and send a ping every 30s ...
-        </p>
-
-        <pre id="info">
-            Loading ...
-        </pre>
-
+        <div class="row">
+            <h1>Port forwarding connectivity debug log</h1>
+            <p><a href="https://github.com/jnewland/codespaces-websockets-bug">https://github.com/jnewland/codespaces-websockets-bug</a></p>
+            <ul>
+                <li>Attempts to connect to websocket every 10s and send a ping every 30s</li>
+                <li>Attempts to perform `GET /auth/test` every 10s</li>
+            </ul>
+        </div>
+        <div class="row">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <h3>Websocket</h3>
+                        <pre id="info">
+                            Loading ...
+                        </pre>
+                    </div>
+                    <div class="col">
+                        <h3>HTTP /auth</h3>
+                        <pre id="auth">
+                            Loading ...
+                        </pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <p><a href="https://github.com/jnewland/codespaces-websockets-bug">https://github.com/jnewland/codespaces-websockets-bug</a></p>
+        </div>
     </div>
 </body>
  
 <script>
-    function log(string) {
-        document.getElementById("info").innerHTML += new Date() + " => " + string + "<br />";
+    function log(string, div="info") {
+        document.getElementById(div).innerHTML += new Date() + " => " + string + "<br />";
     }
     let loadDate = new Date();
     let connected = false;
@@ -49,6 +71,26 @@ async def hello(request):
 
         const url = "wss://" + window.location.host + "/ws";
         log("Connecting to " + url + " ...");
+
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4) {
+                if (this.status == 200) {
+                    log("/auth/test " + this.status + ": " + xhttp.responseText + " " + xhttp.getAllResponseHeaders(), "auth")
+
+                    timeout = setTimeout(() => {
+                        log("Get /auth/test ...", "auth");
+                        xhttp.open("GET", "/auth/test", true);
+                        xhttp.send();
+                    }, 10000);
+                } else {
+                    log("/auth/test " + this.status + " " +xhttp.getAllResponseHeaders(), "auth")
+                }
+            }
+        };
+        log("Get /auth/test ...", "auth");
+        xhttp.open("GET", "/auth/test", true);
+        xhttp.send();
 
         const socket = new WebSocket(url);
         let timeout;
@@ -63,9 +105,15 @@ async def hello(request):
             socket.send("ping");
         });
 
+        socket.addEventListener("error", function (event) {
+            console.log(event)
+            log("Error. Connected " + ((new Date().getTime() - startDate.getTime()) / 1000).toFixed(2) + " seconds.");
+        });
+
         socket.addEventListener("close", function (event) {
+            console.log(event)
             if (connected) {
-                log("Connection lost! Connected " + ((new Date().getTime() - startDate.getTime()) / 1000).toFixed(2) + " seconds.");
+                log("Connection failed. Connected " + ((new Date().getTime() - startDate.getTime()) / 1000).toFixed(2) + " seconds.");
 
                 clearTimeout(timeout);
 
@@ -74,13 +122,13 @@ async def hello(request):
                 }, 1000);
 
             } else {
-                log("Connection failed! " + ((new Date().getTime() - loadDate.getTime()) / 1000).toFixed(2) + " seconds since page load.");
+                log("Connection failed: " + ((new Date().getTime() - loadDate.getTime()) / 1000).toFixed(2) + " seconds since page load.");
 
                 timeout = setTimeout(() => {
                     StartTest();
                 }, 10000);
             }
-
+            connected = false;
         });
 
         socket.addEventListener("message", function (event) {
@@ -94,11 +142,12 @@ async def hello(request):
     }
 
     document.getElementById("info").innerHTML = "";
+    document.getElementById("auth").innerHTML = "";
     StartTest();
 </script>
  
 </html>
-""",
+"""
     )
 
 
