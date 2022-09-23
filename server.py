@@ -22,39 +22,34 @@ async def hello(request):
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Port forwarding connectivity debug log</title>
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@3.4.1/dist/css/bootstrap.min.css" integrity="sha384-HSMxcRTRxnN+Bdg0JdbxYKrThecOKuH5zCYotlSAcp1+c8xmyTe9GYg1l9a69psu" crossorigin="anonymous">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.1/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-iYQeCzEYFbKjA/T2uDLTpkwGzCiq6soy8tYaI1GyVh/UjpbCx/TYkiZhlZB6+fzT" crossorigin="anonymous">
 </head>
  
 <body>
-    <div class="container">
-        <div class="row">
+    <div class="col mx-auto p-4 py-md-5">
+        <div class="row g-5">
             <h1>Port forwarding connectivity debug log</h1>
             <p><a href="https://github.com/jnewland/codespaces-websockets-bug">https://github.com/jnewland/codespaces-websockets-bug</a></p>
-            <ul>
-                <li>Attempts to connect to websocket every 10s and send a ping every 30s</li>
-                <li>Attempts to perform `GET /auth/test` every 10s</li>
-            </ul>
         </div>
-        <div class="row">
-            <div class="container">
-                <div class="row">
-                    <div class="col">
-                        <h3>Websocket</h3>
-                        <pre id="info">
-                            Loading ...
-                        </pre>
-                    </div>
-                    <div class="col">
-                        <h3>HTTP /auth</h3>
-                        <pre id="auth">
-                            Loading ...
-                        </pre>
-                    </div>
+        <div class="row g-5">
+            <div class="col-md-6">
+                <h3>Websocket</h3>
+                <p>Attempts to connect to websocket every 10s and send a ping every 30s</p>
+                <div class="bg-light p-3 mb-2">
+                    <samp id="info" class="small">
+                        Loading ...
+                    </samp>
                 </div>
             </div>
-        </div>
-        <div class="row">
-            <p><a href="https://github.com/jnewland/codespaces-websockets-bug">https://github.com/jnewland/codespaces-websockets-bug</a></p>
+            <div class="col-md-6">
+                <h3>HTTP /auth</h3>
+                <p>Attempts to perform `GET /auth/test` every 10s</p>
+                <div class="bg-light p-3 mb-2">
+                    <samp id="auth" class="small">
+                        Loading ...
+                    </samp>
+                </div>
+            </div>
         </div>
     </div>
 </body>
