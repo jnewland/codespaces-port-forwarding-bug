@@ -1,7 +1,8 @@
-# GitHub Codespaces websocket bugs / limitations
+# GitHub Codespaces port forwarding bugs / limitations
 
-* Connectivity fails for 1-5 minutes at startup due to improper `Origin` header on forwarded requests
-* Max ~4 minute connection duration https://github.com/TrueBrain/codespaces-websocket
+* Websocket Connectivity fails for 1-5 minutes at startup due to improper `Origin` header on forwarded requests
+* `/auth` namespace appears reserved for internal use at startup
+* Max ~4 minute Websocket connection duration https://github.com/TrueBrain/codespaces-websocket
 
 ## Reproduction steps
 
