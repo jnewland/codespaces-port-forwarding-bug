@@ -6,9 +6,11 @@ from aiohttp import web
 
 routes = web.RouteTableDef()
 
+
 @routes.get("/auth/test")
 async def auth_test(request):
-    return web.json_response({'status': 'ok'})
+    return web.json_response({"status": "ok"})
+
 
 @routes.get("/")
 async def hello(request):
@@ -142,7 +144,7 @@ async def hello(request):
 </script>
  
 </html>
-"""
+""",
     )
 
 
@@ -177,7 +179,12 @@ logging.basicConfig(level=logging.DEBUG, format="%(asctime)s %(message)s")
 print("")
 print("Open the following link to replicate the bug:")
 print("")
-print("  https://{}-3000.githubpreview.dev/".format(os.getenv("CODESPACE_NAME")))
+print(
+    "  https://{}-3000.{}/".format(
+        os.getenv("CODESPACE_NAME"),
+        os.getenv("GITHUB_CODESPACES_PORT_FORWARDING_DOMAIN"),
+    )
+)
 print("")
 
 web.run_app(app, port=3000, access_log_class=AccessLogger)
