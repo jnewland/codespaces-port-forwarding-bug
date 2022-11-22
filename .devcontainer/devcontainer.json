@@ -1,10 +1,6 @@
 {
 	"name": "Codespaces and Websockets",
-	"build": {
-		"dockerfile": "Dockerfile",
-		"context": "..",
-		"args": { "VARIANT": "3" }
-	},
+	"image": "mcr.microsoft.com/devcontainers/universal:linux",
 
 	"extensions": [
 		"ms-python.python"
@@ -18,5 +14,4 @@
 	},
 
 	"postCreateCommand": "pip3 install -r requirements.txt",
-	"remoteUser": "vscode"
 }
