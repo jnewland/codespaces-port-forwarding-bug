@@ -1,3 +1,5 @@
+> Note: bug fixed Nov 2022
+
 # GitHub Codespaces port forwarding bugs / limitations
 
 * Websocket Connectivity fails for 1-5 minutes at startup due to improper `Origin` header on forwarded requests
